@@ -26,16 +26,16 @@ We also provide models pre-trained with [DeepCluster-v2](./main_deepclusterv2.py
 
 | method | epochs | batch-size | multi-crop | ImageNet top-1 acc. | url | args |
 |-------------------|-------------------|---------------------|--------------------|--------------------|--------------------|--------------------|
-| SwAV | 800 | 4096 | 2x224 + 6x96 | 75.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_800ep_pretrain.pth.tar) | [script](./scripts/swav_800ep_pretrain.sh) |
-| SwAV | 400 | 4096 | 2x224 + 6x96 | 74.6 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_400ep_pretrain.pth.tar) | [script](./scripts/swav_400ep_pretrain.sh) |
-| SwAV | 200 | 4096 | 2x224 + 6x96 | 73.9 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_200ep_pretrain.pth.tar) | [script](./scripts/swav_200ep_pretrain.sh) |
-| SwAV | 100 | 4096 | 2x224 + 6x96 | 72.1 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_100ep_pretrain.pth.tar) | [script](./scripts/swav_100ep_pretrain.sh) |
-| SwAV | 200 | 256 | 2x224 + 6x96 | 72.7 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_200ep_bs256_pretrain.pth.tar) | [script](./scripts/swav_200ep_bs256_pretrain.sh) |
-| SwAV | 400 | 256 | 2x224 + 6x96 | 74.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_400ep_bs256_pretrain.pth.tar) | [script](./scripts/swav_400ep_bs256_pretrain.sh) |
-| SwAV | 400 | 4096 | 2x224 | 70.1 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_400ep_2x224_pretrain.pth.tar) | [script](./scripts/swav_400ep_2x224_pretrain.sh) |
-| DeepCluster-v2 | 800 | 4096 | 2x224 + 6x96 | 75.2 | [model](https://dl.fbaipublicfiles.com/deepcluster/deepclusterv2_800ep_pretrain.pth.tar) | [script](./scripts/deepclusterv2_800ep_pretrain.sh) |
-| DeepCluster-v2 | 400 | 4096 | 2x160 + 4x96 | 74.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/deepclusterv2_400ep_pretrain.pth.tar) | [script](./scripts/deepclusterv2_400ep_pretrain.sh) |
-| DeepCluster-v2 | 400 | 4096 | 2x224 | 70.2 | [model](https://dl.fbaipublicfiles.com/deepcluster/deepclusterv2_400ep_2x224_pretrain.pth.tar) | [script](./scripts/deepclusterv2_400ep_2x224_pretrain.sh) |
+| SwAV | 800 | 4096 | 2x224 + 6x96 | 75.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_800ep_pretrain.pth.tar) | [script](scripts/old_script/swav_800ep_pretrain.sh) |
+| SwAV | 400 | 4096 | 2x224 + 6x96 | 74.6 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_400ep_pretrain.pth.tar) | [script](scripts/old_script/swav_400ep_pretrain.sh) |
+| SwAV | 200 | 4096 | 2x224 + 6x96 | 73.9 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_200ep_pretrain.pth.tar) | [script](scripts/old_script/swav_200ep_pretrain.sh) |
+| SwAV | 100 | 4096 | 2x224 + 6x96 | 72.1 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_100ep_pretrain.pth.tar) | [script](scripts/old_script/swav_100ep_pretrain.sh) |
+| SwAV | 200 | 256 | 2x224 + 6x96 | 72.7 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_200ep_bs256_pretrain.pth.tar) | [script](scripts/old_script/swav_200ep_bs256_pretrain.sh) |
+| SwAV | 400 | 256 | 2x224 + 6x96 | 74.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_400ep_bs256_pretrain.pth.tar) | [script](scripts/old_script/swav_400ep_bs256_pretrain.sh) |
+| SwAV | 400 | 4096 | 2x224 | 70.1 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_400ep_2x224_pretrain.pth.tar) | [script](scripts/old_script/swav_400ep_2x224_pretrain.sh) |
+| DeepCluster-v2 | 800 | 4096 | 2x224 + 6x96 | 75.2 | [model](https://dl.fbaipublicfiles.com/deepcluster/deepclusterv2_800ep_pretrain.pth.tar) | [script](scripts/old_script/deepclusterv2_800ep_pretrain.sh) |
+| DeepCluster-v2 | 400 | 4096 | 2x160 + 4x96 | 74.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/deepclusterv2_400ep_pretrain.pth.tar) | [script](scripts/old_script/deepclusterv2_400ep_pretrain.sh) |
+| DeepCluster-v2 | 400 | 4096 | 2x224 | 70.2 | [model](https://dl.fbaipublicfiles.com/deepcluster/deepclusterv2_400ep_2x224_pretrain.pth.tar) | [script](scripts/old_script/deepclusterv2_400ep_2x224_pretrain.sh) |
 | SeLa-v2 | 400 | 4096 | 2x160 + 4x96 | 71.8 | [model](https://dl.fbaipublicfiles.com/deepcluster/selav2_400ep_pretrain.pth.tar) | - |
 | SeLa-v2 | 400 | 4096 | 2x224 | 67.2 | [model](https://dl.fbaipublicfiles.com/deepcluster/selav2_400ep_2x224_pretrain.pth.tar) | - |
 
@@ -43,17 +43,17 @@ We also provide models pre-trained with [DeepCluster-v2](./main_deepclusterv2.py
 We provide SwAV models with ResNet-50 networks where we multiply the width by a factor ×2, ×4, and ×5.
 | network | parameters | epochs | ImageNet top-1 acc. | url | args |
 |-------------------|---------------------|--------------------|--------------------|--------------------|--------------------|
-| RN50-w2 | 94M | 400 | 77.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_RN50w2_400ep_pretrain.pth.tar) | [script](./scripts/swav_RN50w2_400ep_pretrain.sh) |
-| RN50-w4 | 375M | 400 | 77.9 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_RN50w4_400ep_pretrain.pth.tar) | [script](./scripts/swav_RN50w4_400ep_pretrain.sh) |
+| RN50-w2 | 94M | 400 | 77.3 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_RN50w2_400ep_pretrain.pth.tar) | [script](scripts/old_script/swav_RN50w2_400ep_pretrain.sh) |
+| RN50-w4 | 375M | 400 | 77.9 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_RN50w4_400ep_pretrain.pth.tar) | [script](scripts/old_script/swav_RN50w4_400ep_pretrain.sh) |
 | RN50-w5 | 586M | 400 | 78.5 | [model](https://dl.fbaipublicfiles.com/deepcluster/swav_RN50w5_400ep_pretrain.pth.tar) | - |
 
 ## Running times
 We provide the running times for some of our runs:
 | method | batch-size | multi-crop | scripts | time per epoch |
 |---------------------|--------------------|--------------------|--------------------|--------------------|
-| SwAV | 4096 | 2x224 + 6x96 | [\*](./scripts/swav_800ep_pretrain.sh) [\*](./scripts/swav_400ep_pretrain.sh) [\*](./scripts/swav_200ep_pretrain.sh) [\*](./scripts/swav_100ep_pretrain.sh) | 3min40s |
-| SwAV | 256 | 2x224 + 6x96 | [\*](./scripts/swav_200ep_bs256_pretrain.sh) [\*](./scripts/swav_400ep_bs256_pretrain.sh) | 52min10s |
-| DeepCluster-v2 | 4096 | 2x160 + 4x96 | [\*](./scripts/deepclusterv2_400ep_pretrain.sh) | 3min13s |
+| SwAV | 4096 | 2x224 + 6x96 | [\*](scripts/old_script/swav_800ep_pretrain.sh) [\*](scripts/old_script/swav_400ep_pretrain.sh) [\*](scripts/old_script/swav_200ep_pretrain.sh) [\*](scripts/old_script/swav_100ep_pretrain.sh) | 3min40s |
+| SwAV | 256 | 2x224 + 6x96 | [\*](scripts/old_script/swav_200ep_bs256_pretrain.sh) [\*](scripts/old_script/swav_400ep_bs256_pretrain.sh) | 52min10s |
+| DeepCluster-v2 | 4096 | 2x160 + 4x96 | [\*](scripts/old_script/deepclusterv2_400ep_pretrain.sh) | 3min13s |
 
 # Running SwAV unsupervised training
 
@@ -172,7 +172,7 @@ This is especially useful when working with small batches because it improves th
 
 If you start using the queue too early or if you use a too large queue, this can considerably disturb training: this is because the queue members are too inconsistent.
 After introducing the queue the loss should be lower than what it was without the queue.
-On the following loss curve (30 first epochs of this [script](./scripts/swav_200ep_bs256_pretrain.sh)) we introduced the queue at epoch 15.
+On the following loss curve (30 first epochs of this [script](scripts/old_script/swav_200ep_bs256_pretrain.sh)) we introduced the queue at epoch 15.
 We observe that it made the loss go more down.
 <div align="left">
   <img width="35%" alt="SwAV training loss batch_size=256 during the first 30 epochs" src="https://dl.fbaipublicfiles.com/deepcluster/swav_loss_bs256_30ep.png">

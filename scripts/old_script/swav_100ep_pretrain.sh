@@ -14,10 +14,6 @@
 #SBATCH --time=7:00:00
 #SBATCH --mem=450G
 
-master_node=${SLURM_NODELIST:0:9}${SLURM_NODELIST:10:4}
-dist_url="tcp://"
-dist_url+=$master_node
-dist_url+=:40000
 
 DATASET_PATH="/path/to/imagenet/train"
 EXPERIMENT_PATH="./experiments/swav_100ep_pretrain"
@@ -50,3 +46,6 @@ srun --output=${EXPERIMENT_PATH}/%j.out --error=${EXPERIMENT_PATH}/%j.err --labe
 --use_fp16 true \
 --sync_bn apex \
 --dump_path $EXPERIMENT_PATH
+
+
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="jmkim@10.64.2.12:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="jbmpark@10.64.2.239:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/jbmpark/workspace/swav" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="jmkim@10.64.2.12:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/raid/jmkim/workspace/swav/" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="jmkim@10.64.2.12:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/raid/jmkim/workspace/swav/" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

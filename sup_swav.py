@@ -208,7 +208,7 @@ def main():
     if os.path.isfile(queue_path):
         queue = torch.load(queue_path)["queue"]
     # the queue needs to be divisible by the batch size
-    args.queue_length -= args.queue_length % (args.batch_size * args.world_size)
+    # args.queue_length -= args.queue_length % (args.batch_size * args.world_size)
 
     cudnn.benchmark = True
 
@@ -221,15 +221,12 @@ def main():
         train_loader.sampler.set_epoch(epoch)
 
         # optionally starts a queue
-        if args.queue_length > 0 and epoch >= args.epoch_queue_starts and queue is None:
-            queue= torch.zeros(
-                len(args.crops_for_assign),
-                args.queue_length // args.world_size,
-                args.feat_dim,
-            ).cuda(queue)
-
+        # queue shape : (Ncrops, Lqueue, feat) --> (NClass, NCrops, Lqueue, feat)
+        if queue is None:
+            queue = torch.randn(1000, args.feat_dim).cuda()
+            queue = nn.functional.normalize(queue, dim=1, p=2)
         # train the network
-        scores, queue = train(train_loader, model, optimizer, epoch, lr_schedule, queue)
+        scores, queue = train(train_loader, model, optimizer, epoch, lr_schedule, queue, args)
         training_stats.update(scores)
 
         # save checkpoints
@@ -254,14 +251,13 @@ def main():
             torch.save({"queue": queue}, queue_path)
 
 
-def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
+def train(train_loader, model, optimizer, epoch, lr_schedule, queue, args):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
 
     softmax = nn.Softmax(dim=1).cuda()
     model.train()
-    use_the_queue = False
 
     end = time.time()
     for it, inputs in enumerate(train_loader):
@@ -281,47 +277,45 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
 
         # ============ data split ===========
         inputs, target = inputs
-        # print(target)
-        # print(target.shape)
         # ============ multi-res forward passes ... ============
         embedding, output = model(inputs)
         embedding = embedding.detach()
         bs = inputs[0].size(0)
 
+        # ============ EMA class-wise feature vector ==========
+        for b in range(bs):
+            queue[target[b]] = queue[target[b]] * 0.99 + (embedding[b] + embedding[bs + b])*0.01/2
+        queue = nn.functional.normalize(queue, dim=1, p=2)
+        dist.all_reduce(queue)
+        queue /= args.world_size
+        queue = nn.functional.normalize(queue, dim=1, p=2)
         # ============ swav loss ... ============
         loss = 0
-        for i, crop_id in enumerate(args.crops_for_assign):
-            with torch.no_grad():
-                out = output[bs * crop_id: bs * (crop_id + 1)]
 
-                # time to use the queue
-                if queue is not None:
-                    if use_the_queue or not torch.all(queue[i, -1, :] == 0):
-                        use_the_queue = True
-                        # print('queue_shape:',queue[i].shape)
-                        out = torch.cat((torch.mm(
-                            queue[i],
-                            model.module.prototypes.weight.t()
-                        ), out))
-                    # fill the queue
-                    queue[i, bs:] = queue[i, :-bs].clone()
-                    queue[i, :bs] = embedding[crop_id * bs: (crop_id + 1) * bs]
-                # get assignments
-                q = out / args.epsilon
-                if args.improve_numerical_stability:
-                    M = torch.max(q)
-                    dist.all_reduce(M, op=dist.ReduceOp.MAX)
-                    q -= M
-                q = torch.exp(q).t()
-                q = distributed_sinkhorn(q, args.sinkhorn_iterations)[-bs:]
+        q = torch.mm(queue, model.module.prototypes.weight.t())
+        q = q / args.epsilon
+        if args.improve_numerical_stability:
+            M = torch.max(q)
+            dist.all_reduce(M, op=dist.ReduceOp.MAX)
+            q -= M
 
-            # cluster assignment prediction
-            subloss = 0
-            for v in np.delete(np.arange(np.sum(args.nmb_crops)), crop_id):
-                p = softmax(output[bs * v: bs * (v + 1)] / args.temperature)
-                subloss -= torch.mean(torch.sum(q * torch.log(p), dim=1))
-            loss += subloss / (np.sum(args.nmb_crops) - 1)
-        loss /= len(args.crops_for_assign)
+        q = torch.exp(q).t()
+        q = sinkhorn(q, args.sinkhorn_iterations)
+        # q = distributed_sinkhorn(q, args.sinkhorn_iterations)
+
+        # match q /w label (1000, num_p) --> (bsz, num_p)
+        for b in range(bs):
+            if b == 0:
+                matched_q = q[target[b]].unsqueeze(0)
+            else:
+                matched_q = torch.cat([matched_q, q[target[b]].unsqueeze(0)], 0)
+
+        # cluster assignment prediction
+        subloss = 0
+        for v in np.arange(np.sum(args.nmb_crops)):
+            p = softmax(output[bs * v: bs * (v + 1)] / args.temperature)
+            subloss -= torch.mean(torch.sum(matched_q * torch.log(p), dim=1))
+        loss += subloss / np.sum(args.nmb_crops)
 
         # ============ backward and optim step ... ============
         optimizer.zero_grad()
@@ -358,6 +352,23 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
             )
     return (epoch, losses.avg), queue
 
+
+def sinkhorn(Q, nmb_iters):
+    with torch.no_grad():
+        Q = shoot_infs(Q)
+        sum_Q = torch.sum(Q)
+        # dist.all_reduce(sum_Q)
+        Q /= sum_Q
+        r = torch.ones(Q.shape[0]).cuda(non_blocking=True) / Q.shape[0]
+        c = torch.ones(Q.shape[1]).cuda(non_blocking=True) / Q.shape[1]
+        for it in range(nmb_iters):
+            u = torch.sum(Q, dim=1)
+            # dist.all_reduce(u)
+            u = r / u
+            u = shoot_infs(u)
+            Q *= u.unsqueeze(1)
+            Q *= (c / torch.sum(Q, dim=0)).unsqueeze(0)
+        return (Q / torch.sum(Q, dim=0, keepdim=True)).t().float()
 
 def distributed_sinkhorn(Q, nmb_iters):
     with torch.no_grad():

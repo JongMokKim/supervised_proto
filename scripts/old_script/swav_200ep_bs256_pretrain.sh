@@ -19,8 +19,8 @@ dist_url="tcp://"
 dist_url+=$master_node
 dist_url+=:40000
 
-DATASET_PATH="/path/to/imagenet/train"
-EXPERIMENT_PATH="./experiments/swav_200ep_bs256_pretrain"
+DATASET_PATH="/data/val"
+EXPERIMENT_PATH="./experiments/swav_init"
 mkdir -p $EXPERIMENT_PATH
 
 srun --output=${EXPERIMENT_PATH}/%j.out --error=${EXPERIMENT_PATH}/%j.err --label python -u main_swav.py \

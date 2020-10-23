@@ -79,9 +79,15 @@ def initialize_exp(params, *args, dump_params=True):
     - create a panda object to keep track of the training statistics
     """
 
+    # gen dump path
+    if params.rank and not os.path.isdir(params.dump_path) and not params.dump_path=='.':
+        os.mkdir(params.dump_path)
+
     # dump parameters
-    if dump_params:
-        pickle.dump(params, open(os.path.join(params.dump_path, "params.pkl"), "wb"))
+    if params.rank and dump_params:
+        with open(os.path.join(params.dump_path, "params.pkl"), "wb") as f:
+            pickle.dump(params, f)
+        # pickle.dump(params, open(os.path.join(params.dump_path, "params.pkl"), "wb"))
 
     # create repo to store checkpoints
     params.dump_checkpoints = os.path.join(params.dump_path, "checkpoints")
