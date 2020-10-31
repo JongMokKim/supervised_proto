@@ -212,6 +212,11 @@ def main():
 
     cudnn.benchmark = True
 
+    ## initialize queue
+    print('start initialize queue')
+    queue = init_queue(train_loader, model, args)
+    print('queue initialize finish')
+
     for epoch in range(start_epoch, args.epochs):
 
         # train the network for one epoch
@@ -222,9 +227,9 @@ def main():
 
         # optionally starts a queue
         # queue shape : (Ncrops, Lqueue, feat) --> (NClass, NCrops, Lqueue, feat)
-        if queue is None:
-            queue = torch.randn(1000, args.feat_dim).cuda()
-            queue = nn.functional.normalize(queue, dim=1, p=2)
+        # if queue is None:
+        #     queue = torch.randn(1000, args.feat_dim).cuda()
+        #     queue = nn.functional.normalize(queue, dim=1, p=2)
         # train the network
         scores, queue = train(train_loader, model, optimizer, epoch, lr_schedule, queue, args)
         training_stats.update(scores)
@@ -250,6 +255,29 @@ def main():
         if queue is not None:
             torch.save({"queue": queue}, queue_path)
 
+def init_queue(train_loader ,model, args):
+
+    queue = torch.zeros(1000, args.feat_dim).cuda()
+    model.eval()
+
+    for it, inputs in enumerate(train_loader):
+        inputs, target = inputs
+        if args.local_rank==0 and it % 50 == 0:
+            print('initialize step : ',it)
+        # ============ multi-res forward passes ... ============
+        with torch.no_grad():
+            embedding, _ = model(inputs)
+            embedding = embedding.detach()
+        bs = inputs[0].size(0)
+
+        # ============ cumulate feature vector ==========
+        for b in range(bs):
+            queue[target[b]] = queue[target[b]] + embedding[b] + embedding[bs + b]
+
+    dist.all_reduce(queue)
+    queue = nn.functional.normalize(queue, dim=1, p=2)
+
+    return queue
 
 def train(train_loader, model, optimizer, epoch, lr_schedule, queue, args):
     batch_time = AverageMeter()
@@ -292,15 +320,16 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue, args):
         # ============ swav loss ... ============
         loss = 0
 
-        q = torch.mm(queue, model.module.prototypes.weight.t())
-        q = q / args.epsilon
-        if args.improve_numerical_stability:
-            M = torch.max(q)
-            dist.all_reduce(M, op=dist.ReduceOp.MAX)
-            q -= M
+        with torch.no_grad():
+            q = torch.mm(queue, model.module.prototypes.weight.t())
+            q = q / args.epsilon
+            if args.improve_numerical_stability:
+                M = torch.max(q)
+                dist.all_reduce(M, op=dist.ReduceOp.MAX)
+                q -= M
 
-        q = torch.exp(q).t()
-        q = sinkhorn(q, args.sinkhorn_iterations)
+            q = torch.exp(q).t()
+            q = sinkhorn(q, args.sinkhorn_iterations)
         # q = distributed_sinkhorn(q, args.sinkhorn_iterations)
 
         # match q /w label (1000, num_p) --> (bsz, num_p)

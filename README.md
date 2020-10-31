@@ -21,6 +21,10 @@ import torch
 model = torch.hub.load('facebookresearch/swav', 'resnet50')
 ```
 
+| method | acc |
+|--------|------|
+| Sup swav Init | 74.1 |
+
 We provide several baseline SwAV pre-trained models with ResNet-50 architecture in torchvision format.
 We also provide models pre-trained with [DeepCluster-v2](./main_deepclusterv2.py) and SeLa-v2 obtained by applying improvements from the self-supervised community to [DeepCluster](https://arxiv.org/abs/1807.05520) and [SeLa](https://arxiv.org/abs/1911.05371) (see details in the [appendix of our paper](https://arxiv.org/abs/2006.09882)).
 

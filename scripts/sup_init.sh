@@ -18,11 +18,11 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torch.distributed.launch --nproc_
 --batch_size 80 \
 --base_lr 0.6 \
 --final_lr 0.0006 \
---freeze_prototypes_niters 0 \
+--freeze_prototypes_niters 4000 \
 --wd 0.000001 \
 --warmup_epochs 0 \
 --arch resnet50 \
 --use_fp16 true \
 --sync_bn pytorch \
---dump_path "experiments/sup_init"
+--dump_path "experiments/nograd_test"
 
